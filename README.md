@@ -48,6 +48,31 @@ $resolver = new Illuminate\CodeIgniter\CodeIgniterConnectionResolver($ci);
 Illuminate\Database\Eloquent\Model::setConnectionResolver($resolver);
 ```
 
+To enable events dispatcher support:
+
+```php
+// use our mock PDO class if PDO is not enabled on this server
+if (!class_exists('PDO')) {
+    class_alias('Illuminate\CodeIgniter\FakePDO', 'PDO');
+}
+
+// pass all Laravel database queries through to CodeIgniter
+$ci = get_instance();
+$resolver = new Illuminate\CodeIgniter\CodeIgniterConnectionResolver($ci);
+
+// create a new event dispatcher instance
+$event_dispatcher = new Illuminate\Events\Dispatcher();
+//create a new database manager instance
+$database_manager = new Illuminate\Database\Capsule\Manager();
+// attach the evebt dispatcher instance to the manager instance
+$database_manager->setEventDispatcher($event_dispatcher);
+// attach the event dispatcher to the eloquent
+$database_manager->bootEloquent();
+
+Illuminate\Database\Eloquent\Model::setConnectionResolver($resolver);
+```
+
+
 ## License
 
 [MIT License](https://github.com/expressodev/laravel-codeigniter-db/blob/master/LICENSE)
