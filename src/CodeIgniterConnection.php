@@ -21,6 +21,13 @@ class CodeIgniterConnection extends Connection
         $this->tablePrefix = $this->ci->db->dbprefix;
         $this->useDefaultQueryGrammar();
         $this->useDefaultPostProcessor();
+        try {
+            $this->pdo = new PDO("{$this->ci->db->dbdriver}:host={$this->ci->db->hostname};dbname={$this->ci->db->database};charset={$this->ci->db->char_set}", $this->ci->db->username, $this->ci->db->password);
+        } catch(Exception $e) {
+            if ($this->ci->db->dbdriver == "mysqli") {
+                $this->pdo = new PDO("mysql:host={$this->ci->db->hostname};dbname={$this->ci->db->database};charset={$this->ci->db->char_set}", $this->ci->db->username, $this->ci->db->password);
+            }
+        }
     }
 
     /**
@@ -74,7 +81,7 @@ class CodeIgniterConnection extends Connection
      */
     public function getPdo()
     {
-        throw new \BadMethodCallException('PDO is not supported by CodeIgniter database driver');
+        return $this->pdo;
     }
 
     /**
